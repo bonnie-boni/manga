@@ -1,8 +1,8 @@
 import React from "react";
 import { FlatList, SafeAreaView, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import MangaCard from "../components/MangaCard";
-import { useLibraryStore } from "../store/libraryStore";
+import MangaCard from "@/components/MangaCard";
+import { useLibraryStore } from "@/scripts/libraryStore";
 
 export default function LibraryScreen() {
   const navigation = useNavigation<any>();

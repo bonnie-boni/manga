@@ -8,16 +8,16 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-import SearchBar from "../components/SearchBar";
-import ThemeToggle from "../components/ThemeToggle";
-import SectionHeader from "../components/SectionHeader";
-import HorizontalMangaList from "../components/HorizontalMangaList";
-import GenreFilterRow from "../components/GenreFilterRow";
-import ContinueReadingCard from "../components/ContinueReadingCard";
+import SearchBar from "@/components/SearchBar";
+import ThemeToggle from "@/components/ThemeToggle";
+import SectionHeader from "@/components/SectionHeader";
+import HorizontalMangaList from "@/components/HorizontalMangaList";
+import GenreFilterRow from "@/components/GenreFilterRow";
+import ContinueReadingCard from "@/components/ContinueReadingCard";
 
-import { fetchGenres, fetchNewReleases, fetchTrendingManga } from "../api/mangadex";
-import { useLibraryStore } from "../store/libraryStore";
-import { Genre, Manga } from "../types/manga";
+import { fetchGenres, fetchNewReleases, fetchTrendingManga } from "@/scripts/mangadex";
+import { useLibraryStore } from "@/scripts/libraryStore";
+import { Genre, Manga } from "@/types/manga";
 
 export default function DashboardScreen() {
   const navigation = useNavigation<any>();
