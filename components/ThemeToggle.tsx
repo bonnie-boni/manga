@@ -1,26 +1,28 @@
 import React, { useEffect } from "react";
-import { Pressable } from "react-native";
+import { Pressable, Appearance, StyleSheet } from "react-native";
 import { Moon, Sun } from "lucide-react-native";
-import { useColorScheme } from "nativewind";
 import { useThemeStore } from "@/scripts/themeStore";
 
 /**
  * Icon button that toggles between light and dark mode.
- * Keeps the Zustand store and NativeWind's colorScheme in sync.
+ * Syncs the Zustand store with React Native's core Appearance controller.
  */
 export default function ThemeToggle() {
   const mode = useThemeStore((s) => s.mode);
   const toggleTheme = useThemeStore((s) => s.toggleTheme);
-  const { setColorScheme } = useColorScheme();
 
+  // Sync state changes from your Zustand store to the native platform window
   useEffect(() => {
-    setColorScheme(mode);
+    Appearance.setColorScheme(mode === "dark" ? "dark" : "light");
   }, [mode]);
 
   return (
     <Pressable
       onPress={toggleTheme}
-      className="w-9 h-9 rounded-full items-center justify-center bg-graytone-100 dark:bg-navy-light"
+      style={[
+        styles.buttonBase,
+        mode === "dark" ? styles.buttonDark : styles.buttonLight
+      ]}
       hitSlop={8}
     >
       {mode === "dark" ? (
@@ -31,3 +33,20 @@ export default function ThemeToggle() {
     </Pressable>
   );
 }
+
+// Clean StyleSheet definitions to bypass crashing Tailwind classes
+const styles = StyleSheet.create({
+  buttonBase: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonLight: {
+    backgroundColor: '#F3F4F6', // Equivalent to Tailwind bg-graytone-100
+  },
+  buttonDark: {
+    backgroundColor: '#1E293B', // Equivalent to Tailwind dark:bg-navy-light
+  },
+});

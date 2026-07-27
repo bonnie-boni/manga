@@ -25,9 +25,9 @@ export default function MangaCard({
     <Pressable
       onPress={() => onPress?.(manga)}
       style={{ width }}
-      className="mr-3 active:opacity-70"
+      className="mr-3 m-auto active:opacity-70"
     >
-      <View className="rounded-xl overflow-hidden bg-graytone-100 dark:bg-navy-light aspect-[2/3] shadow-sm">
+      <View className="rounded-xl m-auto overflow-hidden bg-graytone-100 dark:bg-navy-light aspect-[2/3] shadow-sm">
         {manga.coverUrl ? (
           <Image
             source={{ uri: manga.coverUrl }}
@@ -35,7 +35,7 @@ export default function MangaCard({
             resizeMode="cover"
           />
         ) : (
-          <View className="flex-1 items-center justify-center">
+          <View className="flex-1 w-100% items-center justify-center">
             <Text className="text-graytone-400 text-xs">No cover</Text>
           </View>
         )}
