@@ -1,175 +1,98 @@
-import React, { useCallback, useEffect, useState } from "react";
-import {
-  RefreshControl,
-  ScrollView,
-  View,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context"; 
+import { Image } from 'expo-image';
+import { Platform, StyleSheet } from 'react-native';
 
-// Expo Theme Imports
+import { HelloWave } from '@/components/hello-wave';
+import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { Link } from 'expo-router';
 
-import SearchBar from "@/components/SearchBar";
-import ThemeToggle from "@/components/ThemeToggle";
-import SectionHeader from "@/components/SectionHeader";
-import HorizontalMangaList from "@/components/HorizontalMangaList";
-import GenreFilterRow from "@/components/GenreFilterRow";
-import ContinueReadingCard from "@/components/ContinueReadingCard";
-
-import { fetchGenres, fetchNewReleases, fetchTrendingManga } from "@/scripts/mangadex";
-import { useLibraryStore } from "@/scripts/libraryStore";
-import { Genre, Manga } from "@/types/manga";
-
-export default function DashboardScreen() {
-  const navigation = useNavigation<any>();
-
-  const continueReading = useLibraryStore((s) => s.continueReading);
-
-  const [trending, setTrending] = useState<Manga[]>([]);
-  const [newReleases, setNewReleases] = useState<Manga[]>([]);
-  const [genres, setGenres] = useState<Genre[]>([]);
-  const [selectedGenre, setSelectedGenre] = useState<Genre | undefined>();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  const loadData = useCallback(async () => {
-    try {
-      const [trendingRes, newRes, genresRes] = await Promise.all([
-        fetchTrendingManga(10),
-        fetchNewReleases(10),
-        fetchGenres(),
-      ]);
-      setTrending(trendingRes);
-      setNewReleases(newRes);
-      setGenres(genresRes);
-    } catch (err) {
-      console.warn("Failed to load MangaDex data", err);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    loadData();
-  };
-
-  const openManga = (manga: Manga) => {
-    navigation.navigate("MangaDetail", { mangaId: manga.id });
-  };
-
-  const submitSearch = () => {
-    if (searchQuery.trim()) {
-      navigation.navigate("SearchResults", { query: searchQuery.trim() });
-    }
-  };
-
+export default function HomeScreen() {
   return (
-    // Changed to ThemedView to automatically pick up the system background color
-    <ThemedView style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1 }}>
-        {/* Header */}
-        <View className="flex-row items-center justify-between px-4 pt-2 pb-3">
-          <View>
-            {/* ThemedText with secondary styling properties */}
-            <ThemedText style={{ opacity: 0.6, fontSize: 14 }}>
-              Welcome back 👋
-            </ThemedText>
-            {/* ThemedText with bold title styling */}
-            <ThemedText type="title" style={{ fontSize: 24 }}>
-              MangaVerse
-            </ThemedText>
-          </View>
-          <ThemeToggle />
-        </View>
-
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          contentContainerStyle={{ paddingBottom: 32 }}
-        >
-          <View className="mb-5">
-            <SearchBar
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              onSubmit={submitSearch}
+    <ParallaxScrollView
+      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+      headerImage={
+        <Image
+          source={require('@/assets/images/partial-react-logo.png')}
+          style={styles.reactLogo}
+        />
+      }>
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title">Welcome!</ThemedText>
+        <HelloWave />
+      </ThemedView>
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
+        <ThemedText>
+          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
+          Press{' '}
+          <ThemedText type="defaultSemiBold">
+            {Platform.select({
+              ios: 'cmd + d',
+              android: 'cmd + m',
+              web: 'F12',
+            })}
+          </ThemedText>{' '}
+          to open developer tools.
+        </ThemedText>
+      </ThemedView>
+      <ThemedView style={styles.stepContainer}>
+        <Link href="/modal">
+          <Link.Trigger>
+            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
+          </Link.Trigger>
+          <Link.Preview />
+          <Link.Menu>
+            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
+            <Link.MenuAction
+              title="Share"
+              icon="square.and.arrow.up"
+              onPress={() => alert('Share pressed')}
             />
-          </View>
+            <Link.Menu title="More" icon="ellipsis">
+              <Link.MenuAction
+                title="Delete"
+                icon="trash"
+                destructive
+                onPress={() => alert('Delete pressed')}
+              />
+            </Link.Menu>
+          </Link.Menu>
+        </Link>
 
-          {/* Continue Reading */}
-          {continueReading.length > 0 && (
-            <View className="mb-6">
-              <SectionHeader title="Continue Reading" />
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 16 }}
-              >
-                {continueReading.map((item) => (
-                  <ContinueReadingCard
-                    key={item.manga.id}
-                    item={item}
-                    onPress={() => openManga(item.manga)}
-                  />
-                ))}
-              </ScrollView>
-            </View>
-          )}
-
-          {/* Genres */}
-          <View className="mb-6">
-            <SectionHeader title="Genres" />
-            <GenreFilterRow
-              genres={genres}
-              selectedId={selectedGenre?.id}
-              onSelect={(genre) =>
-                navigation.navigate("GenreResults", {
-                  genreId: genre.id,
-                  genreName: genre.name,
-                })
-              }
-            />
-          </View>
-
-          {/* Trending */}
-          <View className="mb-6">
-            <SectionHeader
-              title="Trending Now"
-              onSeeAllPress={() => navigation.navigate("SeeAll", { type: "trending" })}
-            />
-            <HorizontalMangaList data={trending} onCardPress={openManga} />
-          </View>
-
-          {/* New Releases */}
-          <View className="mb-2">
-            <SectionHeader
-              title="New Releases"
-              onSeeAllPress={() => navigation.navigate("SeeAll", { type: "new" })}
-            />
-            <HorizontalMangaList
-              data={newReleases}
-              onCardPress={openManga}
-              markNewIds={newReleases.map((m) => m.id)}
-            />
-          </View>
-
-          {!loading && trending.length === 0 && (
-            <ThemedText style={{ textAlign: 'center', marginTop: 40, opacity: 0.5 }}>
-              Couldn't load manga right now. Pull to refresh.
-            </ThemedText>
-          )}
-        </ScrollView>
-      </SafeAreaView>
-    </ThemedView>
+        <ThemedText>
+          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+        </ThemedText>
+      </ThemedView>
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
+        <ThemedText>
+          {`When you're ready, run `}
+          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
+          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
+          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
+          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+        </ThemedText>
+      </ThemedView>
+    </ParallaxScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  stepContainer: {
+    gap: 8,
+    marginBottom: 8,
+  },
+  reactLogo: {
+    height: 178,
+    width: 290,
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+  },
+});
